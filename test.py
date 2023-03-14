@@ -98,6 +98,7 @@ def desbinarAr(binAr):
     oneLiner = "".join(binAr)
     binNtoDec = int(oneLiner,2)
     return binNtoDec
+
 print(desbinarAr(bintest))
 
 print(4<<1)
@@ -188,3 +189,25 @@ def joinList(l1):
 l = [[1,2,3],[1,1,1]]
 ll=joinList(l)
 ll= ext2(ll, 30)
+
+tag =  [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1] 
+
+def desTag128(Ta):
+    n=8
+    output=[Ta[i:i + n] for i in range(0, len(Ta), n)]
+    tmp = []
+    for i in output:
+        res = int("".join(str(x) for x in i), 2)
+        tmp.append(res)
+    return tmp
+
+def asciificarTag(l1):
+    tmp = []
+    print("Tag en ascii:")
+    for i in l1:
+        print(chr(i),end="")
+    print(" ")
+kkl = desTag128(tag)
+
+asciificarTag(kkl)
+# print()

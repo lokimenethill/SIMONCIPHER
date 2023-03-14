@@ -359,5 +359,21 @@ gmac = xorear2list(gmac, m)
 
 print( "tag: \n", gmac, "\n tamaño: ", len(gmac) )
 
+def desTag128(Ta):
+    n=8
+    output=[Ta[i:i + n] for i in range(0, len(Ta), n)]
+    tmp = []
+    for i in output:
+        res = int("".join(str(x) for x in i), 2)
+        tmp.append(res)
+    return tmp
 
+def asciificarTag(l1):
+    tmp = []
+    print("Tag en ascii:")
+    for i in l1:
+        print(chr(i),end="")
+    print(" ")
+
+print( asciificarTag( desTag128( gmac ) ) )
 
