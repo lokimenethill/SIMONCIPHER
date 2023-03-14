@@ -368,12 +368,7 @@ def desTag128(Ta):
         tmp.append(res)
     return tmp
 
-def asciificarTag(l1):
-    tmp = []
-    print("Tag en ascii:")
-    for i in l1:
-        print(chr(i),end="")
-    print(" ")
 
-print( asciificarTag( desTag128( gmac ) ) )
+
+printAscii( desTag128( gmac ) ) 
 
