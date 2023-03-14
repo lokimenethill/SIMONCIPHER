@@ -1,3 +1,4 @@
+import numpy as np
 
 def shifter(arrayIn,shift):
     tmpAr = []
@@ -102,6 +103,57 @@ def ext2(arr, target):
     t = target-len(arr)
     tmp = [0]*t
     return tmp+arr
+
+def desTag128(Ta):
+    n=8
+    output=[Ta[i:i + n] for i in range(0, len(Ta), n)]
+    tmp = []
+    for i in output:
+        res = int("".join(str(x) for x in i), 2)
+        tmp.append(res)
+    return tmp
+
+def subDiv128(l):
+    n=16
+    output=[l[i:i + n] for i in range(0, len(l), n)]
+    return output
+
+
+
+def xorear2list(l1,l2):
+    tmp = []
+    for i in range(len(l1)):
+        tmp.append(l1[i]^l2[i])
+    return tmp
+
+def MGF( A, B, P):
+  M = np.polymul(A,B)       # Toma el producto de los polinomios  A x B
+  q, R = np.polydiv(M, P)   # Aplica el algoritmo de Euclides para el primitivo
+  r = [0] * (len(P)-1)      # Inicia una lista de ceros del tamaño de p - 1 
+
+  i = 0
+  for coef in R:            # Llena  la lista con los coeficientes del polinomio
+    r[i] = int(coef) % 2    # Binariza los coeficientes
+    i += 1                  # Itera cada elemento de la lista de ceros
+    
+  return r 
+
+def ext(arrIn, lenTarget):    
+    tmp = []
+    aBin = arrIn
+    for i in aBin:
+        if i == 1:
+            tmp.append(1)
+        if i == 0:
+            tmp.append(0)
+    #tmp = tmp[1:]
+    tmp2 = []
+    for i in range(lenTarget-len(tmp)):
+        tmp2.append(0)
+    #print(tmp)    
+    #print(tmp2)
+    #print(noteable)
+    return tmp2+tmp
 
 def simonear(texto,llave):
     n = 64 # tamanio de palabra
@@ -243,6 +295,8 @@ def simonear(texto,llave):
     printAscii(y)
     return x+y
 
+#----------------------------------- TAG 1 Integro---------------------------->
+
 nonce = simonear("MatevickyForm123", "qwertyuiopasdfghjklñzxcvbnmqwert")
 h = simonear("0000000000000000", "qwertyuiopasdfghjklñzxcvbnmqwert")
 def joinList(l1):
@@ -266,36 +320,8 @@ hBin = joinList(hBin)
 
 #print(z, m, T)  ---------------------------------------------------------------      
 
-import numpy as np
 
-def MGF( A, B, P):
-  M = np.polymul(A,B)       # Toma el producto de los polinomios  A x B
-  q, R = np.polydiv(M, P)   # Aplica el algoritmo de Euclides para el primitivo
-  r = [0] * (len(P)-1)      # Inicia una lista de ceros del tamaño de p - 1 
 
-  i = 0
-  for coef in R:            # Llena  la lista con los coeficientes del polinomio
-    r[i] = int(coef) % 2    # Binariza los coeficientes
-    i += 1                  # Itera cada elemento de la lista de ceros
-    
-  return r 
-
-def ext(arrIn, lenTarget):    
-    tmp = []
-    aBin = arrIn
-    for i in aBin:
-        if i == 1:
-            tmp.append(1)
-        if i == 0:
-            tmp.append(0)
-    #tmp = tmp[1:]
-    tmp2 = []
-    for i in range(lenTarget-len(tmp)):
-        tmp2.append(0)
-    #print(tmp)    
-    #print(tmp2)
-    #print(noteable)
-    return tmp2+tmp
 
 fileList = []
 with open('a.jpg', 'rb') as f:
@@ -307,18 +333,7 @@ with open('a.jpg', 'rb') as f:
         # Do something with the hex value
         binValue = f.read(1)
 
-def subDiv128(l):
-    n=16
-    output=[l[i:i + n] for i in range(0, len(l), n)]
-    return output
 
-
-
-def xorear2list(l1,l2):
-    tmp = []
-    for i in range(len(l1)):
-        tmp.append(l1[i]^l2[i])
-    return tmp
 
 subAr=subDiv128(fileList)
 # print(subAr)
@@ -359,16 +374,94 @@ gmac = xorear2list(gmac, m)
 
 print( "tag: \n", gmac, "\n tamaño: ", len(gmac) )
 
-def desTag128(Ta):
-    n=8
-    output=[Ta[i:i + n] for i in range(0, len(Ta), n)]
+
+
+
+print("----------------------------------------->TAG INTEGRO")
+printAscii( desTag128( gmac ) ) 
+
+#----------------------------------- TAG 2 Cambio---------------------------->
+
+nonce = simonear("MatevickyForm123", "Twertyuiopasdfghjklñzxcvbnmqwert")
+h = simonear("0000000000000000", "Twertyuiopasdfghjklñzxcvbnmqwert")
+def joinList(l1):
+    z=[]
+    for i in range(len(l1)):
+        z = z + l1[i]
+    return z
+
+nonceBin=[]
+for i in nonce:
+    a = ext2(binarizarDec(i),8)#target son 8 de cada palabra de 1 byte
+    nonceBin.append(a)
+nonceBin=joinList(nonceBin)
+
+hBin = []
+for i in h:
+    a = ext2(binarizarDec(i), 8)
+    hBin.append(a)
+hBin = joinList(hBin)
+    
+
+#print(z, m, T)  ---------------------------------------------------------------      
+
+
+
+
+fileList = []
+with open('a.jpg', 'rb') as f:
+    binValue = f.read(1)
+    while len(binValue) != 0:
+        hexVal = hex(ord(binValue))
+        fileList.append(hexVal)
+        #print(hexVal)
+        # Do something with the hex value
+        binValue = f.read(1)
+
+
+
+subAr=subDiv128(fileList)
+# print(subAr)
+
+a = int(subAr[0][0],base=16)
+b=ext(binarizarDec(a),8)
+print(b)
+gmac = [0]*128
+
+Ms = []
+for i in range(len(subAr)):
     tmp = []
-    for i in output:
-        res = int("".join(str(x) for x in i), 2)
-        tmp.append(res)
-    return tmp
+    for j in range(len(subAr[i])): 
+        a = ext(binarizarDec(int(subAr[i][j],base=16)),8)#target son 8 de cada palabra de 1 byte
+        tmp.append(a)
+    Ms.append(tmp)
+MsGood =[]  
+for i in range(len(Ms)):
+    z = []
+    for j in range(len(Ms[i])):
+       z=z+Ms[i][j]
+    MsGood.append(z)
+
+# Construimos el polinomio de reduccion: x^127 + x^7 + x^2 + 1 
+primitivo = []
+nbits = 128
+for i in range(nbits + 1):
+  if i == nbits - 128 or i == nbits - 7 or i == nbits - 2 or i == nbits - 1 or i == nbits :
+    primitivo.append(1) 
+  else:
+    primitivo.append(0) 
+
+# Realiza la regla de horner para obtener la MAC
+for m in MsGood:
+    gmac = MGF(xorear2list(gmac, m),h, primitivo) 
+# Por ultimo agrega el Nonce
+gmac = xorear2list(gmac, m)
+
+print( "tag: \n", gmac, "\n tamaño: ", len(gmac) )
 
 
 
+
+print("----------------------------------------->TAG CORRUPTO")
 printAscii( desTag128( gmac ) ) 
 
