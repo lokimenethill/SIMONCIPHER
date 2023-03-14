@@ -174,3 +174,17 @@ p1=[1,1,1,4,4,4]
 p2=[1,2,3,4,5,6]
 print(p1,p2)
 print(andearList(p1, p2))
+def ext2(arr, target):
+    t = target-len(arr)
+    tmp = [0]*t
+    return tmp+arr
+
+def joinList(l1):
+    z=[]
+    for i in range(len(l1)):
+        z = z + l1[i]
+    return z
+
+l = [[1,2,3],[1,1,1]]
+ll=joinList(l)
+ll= ext2(ll, 30)
