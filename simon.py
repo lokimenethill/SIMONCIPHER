@@ -264,15 +264,21 @@ for i in h:
 hBin = joinList(hBin)
     
 
-#print(z, m, T)        
+#print(z, m, T)  ---------------------------------------------------------------      
 
-#
 import numpy as np
 
 def MGF( A, B, P):
-  M = np.polymul(A,B)
-  q, r = np.polydiv(M, P)
-  return r % 2
+  M = np.polymul(A,B)       # Toma el producto de los polinomios  A x B
+  q, R = np.polydiv(M, P)   # Aplica el algoritmo de Euclides para el primitivo
+  r = [0] * (len(P)-1)      # Inicia una lista de ceros del tamaño de p - 1 
+
+  i = 0
+  for coef in R:            # Llena  la lista con los coeficientes del polinomio
+    r[i] = int(coef) % 2    # Binariza los coeficientes
+    i += 1                  # Itera cada elemento de la lista de ceros
+    
+  return r 
 
 def ext(arrIn, lenTarget):    
     tmp = []
@@ -336,7 +342,22 @@ for i in range(len(Ms)):
        z=z+Ms[i][j]
     MsGood.append(z)
 
+# Construimos el polinomio de reduccion: x^127 + x^7 + x^2 + 1 
+primitivo = []
+nbits = 128
+for i in range(nbits + 1):
+  if i == nbits - 128 or i == nbits - 7 or i == nbits - 2 or i == nbits - 1 or i == nbits :
+    primitivo.append(1) 
+  else:
+    primitivo.append(0) 
 
-primitivo = [1,0,0,0,1,1,0,1,1]
+# Realiza la regla de horner para obtener la MAC
 for m in MsGood:
     gmac = MGF(xorear2list(gmac, m),h, primitivo) 
+# Por ultimo agrega el Nonce
+gmac = xorear2list(gmac, m)
+
+print( "tag: \n", gmac, "\n tamaño: ", len(gmac) )
+
+
+
